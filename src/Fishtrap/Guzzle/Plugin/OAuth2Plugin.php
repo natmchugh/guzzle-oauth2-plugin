@@ -26,7 +26,7 @@ class OAuth2Plugin implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array('client.create_request' => 'onRequestCreate');
+        return array('request.before_send' => 'onRequestBeforeSend');
     }
 
    /**
