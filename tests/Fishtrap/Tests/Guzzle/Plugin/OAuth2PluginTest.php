@@ -5,6 +5,7 @@ use Fishtrap\Guzzle\Plugin\OAuth2Plugin;
 use Guzzle\Common\Event;
 use Guzzle\Http\Message\RequestFactory;
 use Fishtrap\Guzzle\Plugin\AccessToken\BearerToken;
+use Fishtrap\Guzzle\Plugin\AccessToken\MacToken;
 
 class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +32,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSignsOauthRequests()
     {
-        $plugin = new Oauth2Plugin(array('token' => 'nanana'));
+        $plugin = new Oauth2Plugin(array('token' => 'nanana', 'token_label' => 'OAuth'));
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
@@ -57,8 +58,42 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event['request']->hasHeader('Authorization'));
 
         $this->assertEquals(
-            'OAuth Bearer nanana',
+            'Bearer nanana',
             (string) $event['request']->getHeader('Authorization')
         );
+    }
+
+    public function testSignsOauthRequestsMacType()
+    {
+        $params = array(
+            'id' => 'h480djs93hd8',
+            'nonce' => '274312:dj83hs9s',
+            'mac' => 'kDZvddkndxvhGRXZhvuDjEWhGeE=',
+        );
+        $token = new MacToken($params);
+        $plugin = new Oauth2Plugin(array('token' => $token));
+        $event = new Event(array(
+            'request' => $this->getRequest(),
+        ));
+        $params = $plugin->onRequestBeforeSend($event);
+
+        $this->assertTrue($event['request']->hasHeader('Authorization'));
+
+        $this->assertEquals(
+            'MAC id="h480djs93hd8",
+nonce="274312:dj83hs9s",
+mac="kDZvddkndxvhGRXZhvuDjEWhGeE="',
+            (string) $event['request']->getHeader('Authorization')
+        );
+    }
+
+   public function testDoesNotAddFalseyValuesToAuthorization()
+    {
+        unset($this->config['token']);
+        $p = new Oauth2Plugin($this->config);
+        $event = new Event(array('request' => $this->getRequest()));
+        $p->onRequestBeforeSend($event);
+        $this->assertTrue($event['request']->hasHeader('Authorization'));
+        $this->assertNotContains('oauth_token=', (string) $event['request']->getHeader('Authorization'));
     }
 }

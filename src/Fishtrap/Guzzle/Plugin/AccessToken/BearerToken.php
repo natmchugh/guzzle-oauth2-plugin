@@ -1,15 +1,23 @@
 <?php
 namespace Fishtrap\Guzzle\Plugin\AccessToken;
 
-class BearerToken
+class BearerToken implements TokenInterface
 {
-    public function __construct($tokenString)
+    private $label;
+
+    public function __construct($tokenString, $label = 'Bearer')
     {
         $this->tokenString = $tokenString;
+        $this->label = $label;
     }
 
     public function __toString()
     {
-        return sprintf('Bearer %s', $this->tokenString);
+        return $this->tokenString;
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
     }
 }

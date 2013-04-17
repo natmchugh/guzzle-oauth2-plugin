@@ -5,6 +5,7 @@ namespace Fishtrap\Guzzle\Plugin;
 use Guzzle\Common\Event;
 use Guzzle\Common\Collection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Fishtrap\Guzzle\Plugin\AccessToken\TokenInterface;
 
 class OAuth2Plugin implements EventSubscriberInterface 
 {
@@ -57,6 +58,9 @@ class OAuth2Plugin implements EventSubscriberInterface
      */
     private function buildAuthorizationHeader($token)
     {
-        return sprintf('OAuth %s', $token);
+        if ($token instanceOf TokenInterface) {
+            $this->config['token_label'] = $token->getLabel();
+        }
+        return sprintf('%s %s', $this->config['token_label'], $token);
     }
 }
