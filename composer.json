@@ -1,0 +1,18 @@
+{
+    "name": "fishtrap/guzzle-oauth2-plugin",
+    "description": "An Oauth2 plugin for guzzle",
+    "require": {
+        "guzzle/guzzle": ">=v3.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Fishtrap\\Guzzle": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nathaniel McHugh",
+            "email": "nat@fishtrap.co.uk"
+        }
+    ]
+}
