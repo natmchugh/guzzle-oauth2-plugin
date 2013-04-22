@@ -32,7 +32,12 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSignsOauthRequests()
     {
-        $plugin = new Oauth2Plugin(array('token' => 'nanana', 'token_label' => 'OAuth'));
+        $plugin = new Oauth2Plugin(
+            array(
+                'token' => 'nanana',
+                'token_format' => 'OAuth',
+            )
+        );
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
@@ -46,10 +51,26 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSignsOauthRequestsBearerType()
+    public function testSignsOauthRequestsBearerTypeDirectInstan()
     {
         $token = new BearerToken('nanana');
         $plugin = new Oauth2Plugin(array('token' => $token));
+        $event = new Event(array(
+            'request' => $this->getRequest(),
+        ));
+        $params = $plugin->onRequestBeforeSend($event);
+
+        $this->assertTrue($event['request']->hasHeader('Authorization'));
+
+        $this->assertEquals(
+            'Bearer nanana',
+            (string) $event['request']->getHeader('Authorization')
+        );
+    }
+
+    public function testSignsOauthRequestsBearerType()
+    {
+        $plugin = new Oauth2Plugin(array('token' => 'nanana', 'token_type' => 'Bearer'));
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
