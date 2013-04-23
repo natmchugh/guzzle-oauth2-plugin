@@ -34,7 +34,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
     {
         $plugin = new Oauth2Plugin(
             array(
-                'token' => 'nanana',
+                'access_token' => 'nanana',
                 'token_format' => 'OAuth',
             )
         );
@@ -54,7 +54,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
     public function testSignsOauthRequestsBearerTypeDirectInstan()
     {
         $token = new BearerToken('nanana');
-        $plugin = new Oauth2Plugin(array('token' => $token));
+        $plugin = new Oauth2Plugin(array('access_token' => $token));
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
@@ -70,7 +70,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSignsOauthRequestsBearerType()
     {
-        $plugin = new Oauth2Plugin(array('token' => 'nanana', 'token_type' => 'Bearer'));
+        $plugin = new Oauth2Plugin(array('access_token' => 'nanana', 'token_type' => 'Bearer'));
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
@@ -92,7 +92,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
             'mac' => 'kDZvddkndxvhGRXZhvuDjEWhGeE=',
         );
         $token = new MacToken($params);
-        $plugin = new Oauth2Plugin(array('token' => $token));
+        $plugin = new Oauth2Plugin(array('access_token' => $token));
         $event = new Event(array(
             'request' => $this->getRequest(),
         ));
@@ -110,7 +110,7 @@ mac="kDZvddkndxvhGRXZhvuDjEWhGeE="',
 
    public function testDoesNotAddFalseyValuesToAuthorization()
     {
-        unset($this->config['token']);
+        unset($this->config['access_token']);
         $p = new Oauth2Plugin($this->config);
         $event = new Event(array('request' => $this->getRequest()));
         $p->onRequestBeforeSend($event);

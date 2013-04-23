@@ -39,12 +39,12 @@ class OAuth2Plugin implements EventSubscriberInterface
     {
         $request = $event['request'];
 
-        if (is_string($this->config['token']) && isset($this->config['token_type'])) {
+        if (is_string($this->config['access_token']) && isset($this->config['token_type'])) {
             $tokenNS = __NAMESPACE__.'\\AccessToken';
             $className = sprintf('%s\\%sToken', $tokenNS, $this->config['token_type']);
-            $this->config['token'] = new $className($this->config['token']);
+            $this->config['access_token'] = new $className($this->config['access_token']);
         }
-        $token = $this->config['token'];
+        $token = $this->config['access_token'];
 
         $request->setHeader(
             'Authorization',
