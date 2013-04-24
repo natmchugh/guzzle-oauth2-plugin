@@ -9,17 +9,22 @@ class MacToken implements TokenInterface
         $this->config = $config;
     }
 
-    public function getLabel()
+    public function getFormat()
     {
         return 'MAC';
     }
 
     public function __toString()
     {
-        $macString = '';
+        $macString = sprintf('%s ', $this->getFormat());
         foreach ($this->config as $key => $value) {
             $macString .= sprintf('%s="%s",'.PHP_EOL, $key, $value);
         }
         return trim($macString, PHP_EOL.",");
+    }
+
+    public function setFormat($format)
+    {
+        $this->format = $format;
     }
 }

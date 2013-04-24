@@ -53,7 +53,7 @@ class OAuth2PluginTest extends \PHPUnit_Framework_TestCase
 
     public function testSignsOauthRequestsBearerTypeDirectInstan()
     {
-        $token = new BearerToken('nanana');
+        $token = new BearerToken(array('access_token' => 'nanana'));
         $plugin = new Oauth2Plugin(array('access_token' => $token));
         $event = new Event(array(
             'request' => $this->getRequest(),

@@ -6,5 +6,7 @@ interface TokenInterface
 {
     public function __toString();
 
-    public function getLabel();
+    public function getFormat();
+
+    public function setFormat($format);
 }

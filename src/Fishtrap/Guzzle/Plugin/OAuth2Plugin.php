@@ -6,6 +6,8 @@ use Guzzle\Common\Event;
 use Guzzle\Common\Collection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Fishtrap\Guzzle\Plugin\AccessToken\TokenInterface;
+use Fishtrap\Guzzle\Plugin\AccessToken\BearerToken;
+use Fishtrap\Guzzle\Plugin\AccessToken\MacToken;
 
 class OAuth2Plugin implements EventSubscriberInterface 
 {
@@ -16,8 +18,9 @@ class OAuth2Plugin implements EventSubscriberInterface
             'version' => '2.0',
             'consumer_key' => 'anonymous',
             'consumer_secret' => 'anonymous',
+            'token_type' => 'Bearer',
         ), array(
-            'consumer_key', 'consumer_secret', 'version',
+            'consumer_key', 'consumer_secret', 'version', 'token_type',
         ));
     }
 
@@ -39,19 +42,27 @@ class OAuth2Plugin implements EventSubscriberInterface
     {
         $request = $event['request'];
 
-        if (is_string($this->config['access_token']) && isset($this->config['token_type'])) {
-            $tokenNS = __NAMESPACE__.'\\AccessToken';
-            $className = sprintf('%s\\%sToken', $tokenNS, $this->config['token_type']);
-            $this->config['access_token'] = new $className($this->config['access_token']);
+        if (is_string($this->config['access_token'])) {
+            $params = array('access_token' => $this->config['access_token']);
+            if (isset($this->config['token_format'])) {
+                $params['token_format'] = $this->config['token_format'];
+            }
+            switch ($this->config['token_type']) {
+                case 'Mac':
+                    $this->config['access_token'] = new MacToken($params);
+                    break;
+                case 'Bearer':
+                default:
+                    $this->config['access_token'] = new BearerToken($params);
+                    break;
+            }
         }
-        $token = $this->config['access_token'];
-
         $request->setHeader(
             'Authorization',
-            $this->buildAuthorizationHeader($token)
+            $this->buildAuthorizationHeader($this->config['access_token'])
         );
 
-        return $token;
+        return $this->config['access_token'];
     }
 
     /**
@@ -63,9 +74,6 @@ class OAuth2Plugin implements EventSubscriberInterface
      */
     private function buildAuthorizationHeader($token)
     {
-        if ($token instanceOf TokenInterface) {
-            $this->config['token_format'] = $token->getLabel();
-        }
-        return sprintf('%s %s', $this->config['token_format'], $token);
+        return (string) $token;
     }
 }
